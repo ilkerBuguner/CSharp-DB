@@ -1,0 +1,2 @@
+ALTER TABLE Users
+ADD CONSTRAINT CH_Password CHECK(DATALENGTH([Password]) >= 5)

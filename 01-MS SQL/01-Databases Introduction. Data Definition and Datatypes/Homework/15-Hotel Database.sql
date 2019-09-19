@@ -1,0 +1,112 @@
+CREATE DATABASE Hotel
+
+USE Hotel
+
+CREATE TABLE Employees (
+Id INT PRIMARY KEY IDENTITY,
+FirstName NVARCHAR(30) NOT NULL,
+LastName NVARCHAR(30) NOT NULL,
+Title NVARCHAR(30) NOT NULL,
+Notes NVARCHAR(100)
+)
+
+INSERT INTO Employees (FirstName, LastName, Title, Notes) VALUES
+('Pesho', 'Peshev', 'Editor', NULL),
+('Gosho', 'Goshev', 'Director', NULL),
+('Sasho', 'Sashev', 'Saler', NULL)
+
+CREATE TABLE Customers (
+AccountNumber NVarChar(30) PRIMARY KEY,
+FirstName NVARCHAR(30) NOT NULL,
+LastName NVARCHAR(30) NOT NULL,
+PhoneNumber NVARCHAR(20) NOT NULL,
+EmergencyName NVARCHAR(30),
+EmergencyNumber VARCHAR(10),
+Notes NVARCHAR(100)
+)
+
+INSERT INTO Customers VALUES
+('001223443444332', 'Pesho', 'Peshev', '0891436251', NULL, NULL, NULL),
+('001223413444332', 'Gosho', 'Georgiev', '0895336251', NULL, NULL, NULL),
+('001226343444332', 'Mitko', 'Petkov', '0891431451', NULL, NULL, NULL)
+
+CREATE TABLE RoomStatus (
+RoomStatus NVarChar(30) PRIMARY KEY NOT NULL,
+Notes NVarChar(100)
+)
+
+INSERT INTO RoomStatus VALUES
+('Cleaned', NULL),
+('NotCleaned', NULL),
+('InUse', NULL)
+
+CREATE TABLE RoomTypes (
+RoomType NVARCHAR(30) PRIMARY KEY NOT NULL,
+Notes NVARCHAR(100)
+)
+
+INSERT INTO RoomTypes VALUES
+('Double', NULL),
+('Apartament', NULL),
+('Single', NULL)
+
+
+CREATE TABLE BedTypes (
+BedType NVARCHAR(30) PRIMARY KEY NOT NULL,
+Notes NVARCHAR(100)
+)
+
+INSERT INTO BedTypes VALUES
+('Single', NULL),
+('Double', NULL),
+('Undefined', NULL);
+
+CREATE TABLE Rooms (
+RoomNumber INT NOT NULL PRIMARY KEY,
+RoomType NVARCHAR(30) FOREIGN KEY REFERENCES RoomTypes(RoomType) NOT NULL,
+BedType NVARCHAR(30) FOREIGN KEY REFERENCES BedTypes(BedType) NOT NULL,
+Rate INT NOT NULL,
+RoomStatus NVARCHAR(30) FOREIGN KEY REFERENCES RoomStatus(RoomStatus) NOT NULL,
+Notes NVARCHAR(100)
+)
+
+INSERT INTO Rooms VALUES
+(101, 'Single', 'Single', 40, 'Cleaned', NULL),
+(201, 'Double', 'Double', 60, 'NotCleaned', NULL),
+(301, 'Apartament', 'Undefined', 100, 'InUse', NULL);
+
+CREATE TABLE Payments (
+Id INT PRIMARY KEY IDENTITY,
+EmployeeId INT FOREIGN KEY REFERENCES Employees(Id) NOT NULL,
+PaymentDate DATETIME2 NOT NULL,
+AccountNumber NVARCHAR(30) FOREIGN KEY REFERENCES Customers(AccountNumber) NOT NULL,
+FirstDateOccupied DATE NOT NULL,
+LastDateOccupied DATE NOT NULL,
+TotalDays INT NOT NULL,
+AmountCharged DECIMAL(15,2) NOT NULL,
+TaxRate DECIMAL(15,2) NOT NULL,
+TaxAmount DECIMAL(15,2) NOT NULL,
+PaymentTotal DECIMAL(15,2) NOT NULL,
+Notes NVARCHAR(100)
+)
+
+INSERT INTO Payments VALUES
+(1, '2019-09-17 10:00:00','001223443444332', '2019-09-17', '2019-09-24', 7, 280, 20, 20, 320, NULL),
+(1, '2019-09-27 10:00:00','001223443444332', '2019-09-12', '2019-09-24', 7, 280, 20, 20, 320, NULL),
+(1, '2019-07-17 10:00:00','001223443444332', '2019-09-27', '2019-09-29', 7, 280, 20, 20, 320, NULL)
+
+CREATE TABLE Occupancies (
+Id INT PRIMARY KEY IDENTITY,
+EmployeeId INT FOREIGN KEY REFERENCES Employees(Id) NOT NULL,
+DateOccupied DATE NOT NULL,
+AccountNumber NVARCHAR(30) FOREIGN KEY REFERENCES Customers(AccountNumber) NOT NULL,
+RoomNumber INT FOREIGN KEY REFERENCES Rooms(RoomNumber) NOT NULL,
+RateApplied INT NOT NULL,
+PhoneCharge DECIMAL(15,2) NOT NULL,
+Notes NVARCHAR(100)
+)
+
+INSERT INTO Occupancies VALUES
+(2, '2019-03-23', '001223443444332', 201, 60, 0, NULL),
+(2, '2019-04-24', '001223443444332', 101, 30, 0, NULL),
+(2, '2019-01-27', '001223443444332', 301, 60, 0, NULL)
