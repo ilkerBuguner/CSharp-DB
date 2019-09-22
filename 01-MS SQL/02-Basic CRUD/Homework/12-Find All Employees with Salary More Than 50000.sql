@@ -1,0 +1,4 @@
+SELECT FirstName, LastName, Salary
+  FROM Employees
+ Where Salary > 50000
+ ORDER BY Salary DESC
