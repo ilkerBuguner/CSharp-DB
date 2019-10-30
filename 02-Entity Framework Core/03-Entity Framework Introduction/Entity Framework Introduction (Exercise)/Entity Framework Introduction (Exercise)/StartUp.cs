@@ -15,7 +15,7 @@ namespace SoftUni
             using (var db = new SoftUniContext())
             {
                 //Change the method here to change current exercise!
-                string neededInfo = GetEmployeesInPeriod(db);
+                string neededInfo = RemoveTown(db);
 
                 Console.WriteLine(neededInfo);
             }
@@ -329,17 +329,16 @@ namespace SoftUni
             return sb.ToString().TrimEnd();
         }
 
-        //14-Delete Project by Id -- Not Finished
+        //14-Delete Project by Id
         public static string DeleteProjectById(SoftUniContext context)
         {
             var project = context.Projects.Find(2);
 
-            var emloyeesWithProjectId2 = context.EmployeesProjects.Where(e => e.ProjectId == 2);
+            var employeeProjectsToRemove = context.EmployeesProjects
+                .Where(e => e.Project == project)
+                .ToList();
 
-            foreach (var e in emloyeesWithProjectId2)
-            {
-                e.ProjectId = 0;
-            }
+            context.EmployeesProjects.RemoveRange(employeeProjectsToRemove);
 
             context.Projects.Remove(project);
 
@@ -362,5 +361,32 @@ namespace SoftUni
 
             return sb.ToString().TrimEnd();
         }
+
+        //15-Remove Town
+        public static string RemoveTown(SoftUniContext context)
+        {
+            var townToRemove = context.Towns.FirstOrDefault(t => t.Name == "Seattle");
+
+            var addressesInTheTown = context.Addresses.Where(a => a.Town == townToRemove).ToList();
+
+            var addressesCount = addressesInTheTown.Count();
+
+            foreach (var address in addressesInTheTown)
+            {
+                var employees = context.Employees.Where(e => e.Address == address).ToList();
+
+                foreach (var employee in employees)
+                {
+                    employee.AddressId = null;
+                }
+
+                context.Addresses.Remove(address);
+            }
+
+            context.Towns.Remove(townToRemove);
+
+            return $"{addressesCount} addresses in Seattle were deleted";
+        }
+
     }
 }
