@@ -16,7 +16,7 @@ namespace ProductShop
             var context = new ProductShopContext();
             //context.Database.EnsureCreated();
 
-            var file = File.ReadAllText(@"C:\Users\Acer\source\repos\08-JSON Processing\JSON-Processing Homework\ProductShop\ProductShop\Datasets\categories-products.json");
+            //var file = File.ReadAllText(@".\..\..\..\Datasets\categories-products.json");
 
             Console.WriteLine(GetCategoriesByProductsCount(context));
         }
@@ -130,5 +130,45 @@ namespace ProductShop
         }
 
         //08-Export Users and Products
+        public static string GetUsersWithProducts(ProductShopContext context)
+        {
+            var users = context.Users
+                .Where(u => u.ProductsSold.Any(p => p.Buyer != null))
+                .OrderByDescending(u => u.ProductsSold.Count(ps => ps.Buyer != null))
+                .Select(u => new UserWithProductsDto
+                {
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                    Age = u.Age,
+                    SoldProducts = new SoldProductsToUserDto
+                    {
+                        Count = u.ProductsSold.Count(p => p.Buyer != null),
+                        Products = u.ProductsSold
+                        .Where(p => p.Buyer != null)
+                        .Select(p => new SoldProductsDto
+                        {
+                            Name = p.Name,
+                            Price = p.Price
+                        })
+                        .ToList()
+                    }
+                })
+                .ToList();
+
+            var result = new UsersAndProductsDto
+            {
+                UsersCount = users.Count,
+                Users = users
+            };
+
+            var json = JsonConvert.SerializeObject(result,
+                Formatting.Indented,
+                new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore
+            });
+
+            return json;
+        }
     }
 }
