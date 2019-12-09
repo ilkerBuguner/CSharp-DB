@@ -13,7 +13,7 @@ namespace TeisterMask.DataProcessor.ImportDto
         public string Username { get; set; }
 
         [JsonProperty("Email")]
-        [Required]
+        [EmailAddress ,Required]
         public string Email { get; set; }
 
         [JsonProperty("Phone")]
